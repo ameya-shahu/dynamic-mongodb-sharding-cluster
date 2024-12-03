@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  configserver:
+    image: mongo:6.0
+    container_name: mongo-config-server
+    command: >
+      mongod --configsvr
+             --replSet configReplSet
+             --port 4401
+             --bind_ip_all
+    ports:
+      - "4401:4401"
+    volumes:
+      - config-data:/data/configdb
+
+  shard1:
+    image: mongo:6.0
+    container_name: mongo-shard1
+    command: >
+      mongod --shardsvr
+             --replSet shard1ReplSet
+             --port 4402
+             --bind_ip_all
+    ports:
+      - "4402:4402"
+    volumes:
+      - shard1-data:/data/db
+
+  mongos:
+    image: mongo:6.0
+    container_name: mongo-router
+    command: >
+      mongos --configdb configReplSet/mongo-config-server:4401
+             --bind_ip_all
+             --port 4403
+    depends_on:
+      - configserver
+      - shard1
+    ports:
+      - "4403:4403"
+
+volumes:
+  config-data:
+  shard1-data:

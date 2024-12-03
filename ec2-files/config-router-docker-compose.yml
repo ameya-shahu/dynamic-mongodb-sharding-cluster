@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  configserver:
+    image: mongo:6.0
+    container_name: mongo-config-server
+    command: >
+      mongod --configsvr
+             --replSet configReplSet
+             --port 27019
+             --bind_ip 0.0.0.0
+    volumes:
+      - config-data:/data/configdb
+    networks:
+      - mongo-network
+    ports:
+      - "27019:27019"
+
+  mongos:
+    image: mongo:6.0
+    container_name: mongo-router
+    command: >
+      mongos --configdb configReplSet/mongo-config-server:27019
+             --bind_ip_all
+             --port 27017
+             --logpath /var/log/mongo/mongos.log
+             --logappend
+    depends_on:
+      - configserver
+    ports:
+      - "27017:27017" # Expose port 27017 for the router
+    networks:
+      - mongo-network
+    volumes:
+      - ./mongoLogs:/var/log/mongo
+
+volumes:
+  config-data:
+
+networks:
+  mongo-network:

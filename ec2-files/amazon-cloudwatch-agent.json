@@ -1,0 +1,17 @@
+{
+    "logs": {
+      "logs_collected": {
+        "files": {
+          "collect_list": [
+            {
+              "file_path": "/home/ec2-user/mongoLogs/mongos.log",
+              "log_group_name": "mongo-router-logs",
+              "log_stream_name": "mongoMainRouter",
+              "timezone": "UTC"
+            }
+          ]
+        }
+      }
+    }
+  }
+  
